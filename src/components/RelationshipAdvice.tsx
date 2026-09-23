@@ -1,16 +1,38 @@
 import React from 'react';
-import { CalendarHeart, CheckCircle2, Compass, HeartHandshake, Sparkles } from 'lucide-react';
+import { CalendarHeart, CheckCircle2, Compass, HeartHandshake, Sparkles, MessageCircleHeart } from 'lucide-react';
 import { CompatibilityResult } from '../types/compatibility';
+import { PsychologicalFlagsCard } from './PsychologicalFlagsCard';
+import { RelationshipTimeline } from './RelationshipTimeline';
 
 interface RelationshipAdviceProps {
   result: CompatibilityResult;
+  onOpenQuiz?: () => void;
 }
 
-export const RelationshipAdvice: React.FC<RelationshipAdviceProps> = ({ result }) => {
-  const { strengths, growthAdvice, dateNightIdeas } = result;
+export const RelationshipAdvice: React.FC<RelationshipAdviceProps> = ({ result, onOpenQuiz }) => {
+  const { strengths, growthAdvice, dateNightIdeas, partner1Name, partner2Name, psychology } = result;
 
   return (
-    <div className="w-full max-w-4xl mx-auto mt-10 space-y-10">
+    <div className="w-full max-w-4xl mx-auto mt-10 space-y-12">
+      {/* Psychological Superpowers & Growth Edges */}
+      {psychology?.greenFlags && psychology?.growthEdges && (
+        <PsychologicalFlagsCard
+          greenFlags={psychology.greenFlags}
+          growthEdges={psychology.growthEdges}
+          partner1={partner1Name}
+          partner2={partner2Name}
+        />
+      )}
+
+      {/* Relationship Milestone Timeline */}
+      {psychology?.timeline && (
+        <RelationshipTimeline
+          timeline={psychology.timeline}
+          partner1={partner1Name}
+          partner2={partner2Name}
+        />
+      )}
+
       {/* Strengths & Growth Areas Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Strengths */}
@@ -61,6 +83,33 @@ export const RelationshipAdvice: React.FC<RelationshipAdviceProps> = ({ result }
           </ul>
         </div>
       </div>
+
+      {/* Love Languages Quiz Callout Banner */}
+      {onOpenQuiz && (
+        <div className="rounded-3xl border border-pink-600/40 bg-gradient-to-r from-[#210925] via-[#1a061d] to-[#140417] p-6 sm:p-8 shadow-xl shadow-rose-950/30 flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-rose-500/20 border border-rose-500/40 text-rose-300">
+              <MessageCircleHeart className="h-6 w-6" />
+            </div>
+            <div>
+              <h4 className="font-serif-luxury text-2xl font-bold text-rose-100">
+                Discover Your 5 Love Languages
+              </h4>
+              <p className="text-xs sm:text-sm text-rose-300/75 font-light mt-0.5">
+                Take the interactive psychological quiz designed for {partner1Name} and {partner2Name} to unlock deeper emotional harmony.
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={onOpenQuiz}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 px-6 py-3 text-xs font-bold text-white shadow-lg shadow-rose-950/80 hover:from-rose-500 hover:to-pink-500 transition-all cursor-pointer whitespace-nowrap active:scale-95"
+          >
+            <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+            <span>Take Compatibility Quiz</span>
+          </button>
+        </div>
+      )}
 
       {/* Curated Date Night Ideas */}
       <div className="rounded-3xl border border-rose-900/40 bg-gradient-to-b from-[#190a1d] to-[#120516] p-6 sm:p-10 shadow-xl shadow-rose-950/30">

@@ -3,11 +3,15 @@ import {
   ChaldeanDetails,
   CompatibilityResult,
   CompatibilityTier,
+  CoupleNickname,
   DateNightIdea,
   DimensionalScores,
   FlamesDetails,
+  GrowthEdgeItem,
   PhoneticDetails,
+  PsychologicalInsights,
   PythagoreanDetails,
+  TimelineMilestone,
 } from '../types/compatibility';
 
 // Pythagorean letter values
@@ -708,6 +712,118 @@ function getArchetype(
   };
 }
 
+export function generateCoupleNicknames(p1Name: string, p2Name: string): CoupleNickname[] {
+  const n1 = p1Name.trim();
+  const n2 = p2Name.trim();
+
+  const half1 = Math.max(2, Math.ceil(n1.length / 2));
+  const half2 = Math.max(2, Math.floor(n2.length / 2));
+
+  // Blend 1: First half of 1 + second half of 2
+  const blend1 =
+    n1.slice(0, half1) +
+    n2.slice(half2).toLowerCase();
+
+  // Blend 2: First half of 2 + second half of 1
+  const blend2 =
+    n2.slice(0, Math.ceil(n2.length / 2)) +
+    n1.slice(Math.floor(n1.length / 2)).toLowerCase();
+
+  // Blend 3: Syllabic fusion
+  const blend3 =
+    n1.slice(0, 3) + n2.slice(-3).toLowerCase();
+
+  const capitalized = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+
+  return [
+    {
+      blend: capitalized(blend1),
+      category: 'Classic Portmanteau',
+      tagline: `Seamless harmony of ${n1} & ${n2}`,
+    },
+    {
+      blend: capitalized(blend2),
+      category: 'Harmonic Blend',
+      tagline: `Sweet acoustic inversion for everyday banter`,
+    },
+    {
+      blend: capitalized(blend3),
+      category: 'Poetic Moniker',
+      tagline: `Chic monogram fusion for your shared adventures`,
+    },
+    {
+      blend: `${capitalized(n1.slice(0, 2))}&${capitalized(n2.slice(0, 2))}`,
+      category: 'Cosmic Alias',
+      tagline: `Minimalist power-couple insignia`,
+    },
+  ];
+}
+
+export function generateTimelineMilestones(
+  p1Name: string,
+  p2Name: string,
+  overallPercentage: number,
+  dimensions: DimensionalScores
+): TimelineMilestone[] {
+  return [
+    {
+      period: 'Months 1 – 3',
+      milestoneTitle: 'The Electric Spark & Discovery',
+      essence: `${p1Name} and ${p2Name} establish an effortless conversational rhythm, unpacking shared humor, music, and late-night curiosity.`,
+      recommendedAction: 'Plan unscripted evening strolls and cozy coffee sessions without checking clocks.',
+    },
+    {
+      period: 'Months 4 – 7',
+      milestoneTitle: 'The Vulnerability Gateway',
+      essence: `Guardrails lower naturally. Raw stories, childhood memories, and unspoken dreams emerge in safe mutual sanctuary.`,
+      recommendedAction: 'Cook a meal together from scratch; celebrate small personal victories as shared triumphs.',
+    },
+    {
+      period: 'Months 8 – 12',
+      milestoneTitle: 'The First Great Odyssey',
+      essence: `A shared road trip, weekend retreat, or creative joint endeavor tests and proves your extraordinary synchronicity.`,
+      recommendedAction: 'Embark on a scenic weekend getaway to nature or an art-filled coastal town.',
+    },
+    {
+      period: 'Year 1 – 2',
+      milestoneTitle: 'Telepathic Groove & Sanctuary',
+      essence: `Intuitive understanding replaces hesitation. A glance across the room communicates volumes, grounding both partners.`,
+      recommendedAction: 'Establish signature couple rituals, like weekly date nights and quiet Sunday morning coffee.',
+    },
+    {
+      period: 'Year 2+',
+      milestoneTitle: 'The Cosmic Power Alliance',
+      essence: `An unshakeable pillar of mutual empowerment, inspiring friends and family through collaborative warmth and timeless love.`,
+      recommendedAction: 'Build a meaningful joint milestone—whether a shared creative project, home sanctuary, or dream journey.',
+    },
+  ];
+}
+
+export function generatePsychologicalFlags(
+  p1Name: string,
+  p2Name: string,
+  dimensions: DimensionalScores
+): { greenFlags: string[]; growthEdges: GrowthEdgeItem[] } {
+  const greenFlags = [
+    `Unconscious Decompression: ${p1Name} and ${p2Name} feel their social nervous system relax completely within 5 minutes of being together.`,
+    `Complementary Pacing: Where one partner tends to accelerate, the other intuitively grounds the room with soothing perspective.`,
+    `Safe Vulnerability: Neither needs to rehearse their words; candid thoughts are met with empathy rather than defense.`,
+  ];
+
+  const growthEdges: GrowthEdgeItem[] = [
+    {
+      quirk: 'The "Hangry" Decision Stalemate',
+      remedy: 'When picking dinner or movies takes too long, implement the "5-2-1 rule": one partner offers 5 options, the other narrows to 2, and the first makes the final pick.',
+    },
+    {
+      quirk: 'Mind-Reading Assumption',
+      remedy: `Even with your high intuition, articulate desires directly: "${p1Name}, I'd love a hug" or "${p2Name}, let's just listen quietly for 10 minutes."`,
+    },
+  ];
+
+  return { greenFlags, growthEdges };
+}
+
 // Master Compatibility Orchestrator
 export function calculateCompatibility(
   name1: string,
@@ -830,6 +946,17 @@ export function calculateCompatibility(
   const { strengths, growth, synastry } = generateInsights(overallPercentage, dimensions, p1Name, p2Name);
   const dateNightIdeas = generateDateIdeas(dimensions);
 
+  const nicknames = generateCoupleNicknames(p1Name, p2Name);
+  const timeline = generateTimelineMilestones(p1Name, p2Name, overallPercentage, dimensions);
+  const { greenFlags, growthEdges } = generatePsychologicalFlags(p1Name, p2Name, dimensions);
+
+  const psychology: PsychologicalInsights = {
+    coupleNicknames: nicknames,
+    timeline,
+    greenFlags,
+    growthEdges,
+  };
+
   return {
     id: `${p1Name.toLowerCase()}-${p2Name.toLowerCase()}-${Date.now()}`,
     calculatedAt: new Date().toLocaleDateString('en-US', {
@@ -851,6 +978,7 @@ export function calculateCompatibility(
     phonetic,
     flames,
     astrological: astrology,
+    psychology,
     strengths,
     growthAdvice: growth,
     dateNightIdeas,

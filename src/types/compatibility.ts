@@ -82,6 +82,40 @@ export interface CompatibilityTier {
   };
 }
 
+export interface CoupleNickname {
+  blend: string;
+  category: 'Classic Portmanteau' | 'Harmonic Blend' | 'Poetic Moniker' | 'Cosmic Alias';
+  tagline: string;
+}
+
+export interface TimelineMilestone {
+  period: string;
+  milestoneTitle: string;
+  essence: string;
+  recommendedAction: string;
+}
+
+export interface GrowthEdgeItem {
+  quirk: string;
+  remedy: string;
+}
+
+export interface PsychologicalInsights {
+  coupleNicknames: CoupleNickname[];
+  timeline: TimelineMilestone[];
+  greenFlags: string[];
+  growthEdges: GrowthEdgeItem[];
+}
+
+export interface LoveLanguageScore {
+  language: 'Words of Affirmation' | 'Quality Time' | 'Acts of Service' | 'Physical Touch' | 'Receiving Gifts';
+  partner1Score: number;
+  partner2Score: number;
+  matchScore: number;
+  description: string;
+  actionTip: string;
+}
+
 export interface CompatibilityResult {
   id: string;
   calculatedAt: string;
@@ -105,6 +139,7 @@ export interface CompatibilityResult {
   phonetic: PhoneticDetails;
   flames: FlamesDetails;
   astrological?: AstrologicalDetails;
+  psychology: PsychologicalInsights;
   
   strengths: string[];
   growthAdvice: string[];

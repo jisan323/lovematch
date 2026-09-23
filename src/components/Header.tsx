@@ -1,10 +1,10 @@
 import React from 'react';
-import { Volume2, VolumeX, Sparkles, Heart, Compass, Bookmark, Flame } from 'lucide-react';
+import { Volume2, VolumeX, Sparkles, Heart, Compass, Bookmark, Flame, MessageCircleHeart } from 'lucide-react';
 import { romanticAudio } from '../utils/audio';
 
 interface HeaderProps {
-  activeTab: 'calculator' | 'algorithms' | 'famous' | 'history';
-  setActiveTab: (tab: 'calculator' | 'algorithms' | 'famous' | 'history') => void;
+  activeTab: 'calculator' | 'quiz' | 'algorithms' | 'famous' | 'history';
+  setActiveTab: (tab: 'calculator' | 'quiz' | 'algorithms' | 'famous' | 'history') => void;
   onReset: () => void;
   savedCount: number;
 }
@@ -32,6 +32,12 @@ export const Header: React.FC<HeaderProps> = ({
       label: 'Love Calculator',
       shortLabel: 'Calculator',
       icon: Heart,
+    },
+    {
+      id: 'quiz' as const,
+      label: 'Love Quiz',
+      shortLabel: 'Quiz',
+      icon: MessageCircleHeart,
     },
     {
       id: 'algorithms' as const,

@@ -7,6 +7,8 @@ import { ResultHero } from './components/ResultHero';
 import { DimensionalBreakdown } from './components/DimensionalBreakdown';
 import { AlgorithmInspector } from './components/AlgorithmInspector';
 import { RelationshipAdvice } from './components/RelationshipAdvice';
+import { CoupleShipNames } from './components/CoupleShipNames';
+import { LoveQuizView } from './components/LoveQuizView';
 import { LoveCertificateModal } from './components/LoveCertificateModal';
 import { FamousCouplesView } from './components/FamousCouplesView';
 import { AlgorithmsGuideView } from './components/AlgorithmsGuideView';
@@ -19,7 +21,7 @@ import { romanticAudio } from './utils/audio';
 const STORAGE_KEY = 'lovematch_saved_couples_v1';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'calculator' | 'algorithms' | 'famous' | 'history'>('calculator');
+  const [activeTab, setActiveTab] = useState<'calculator' | 'quiz' | 'algorithms' | 'famous' | 'history'>('calculator');
   const [isCalculating, setIsCalculating] = useState(false);
   const [currentResult, setCurrentResult] = useState<CompatibilityResult | null>(null);
   const [pendingCalculation, setPendingCalculation] = useState<{
@@ -187,6 +189,14 @@ export default function App() {
                   onReset={handleReset}
                 />
 
+                {currentResult.psychology?.coupleNicknames && (
+                  <CoupleShipNames
+                    nicknames={currentResult.psychology.coupleNicknames}
+                    partner1={currentResult.partner1Name}
+                    partner2={currentResult.partner2Name}
+                  />
+                )}
+
                 <DimensionalBreakdown
                   dimensions={currentResult.dimensions}
                   partner1={currentResult.partner1Name}
@@ -195,12 +205,23 @@ export default function App() {
 
                 <AlgorithmInspector result={currentResult} />
 
-                <RelationshipAdvice result={currentResult} />
+                <RelationshipAdvice
+                  result={currentResult}
+                  onOpenQuiz={() => setActiveTab('quiz')}
+                />
               </div>
             ) : (
               <LoveForm onAnalyze={handleStartAnalysis} isLoading={isCalculating} />
             )}
           </>
+        )}
+
+        {activeTab === 'quiz' && (
+          <LoveQuizView
+            initialPartner1={currentResult?.partner1Name}
+            initialPartner2={currentResult?.partner2Name}
+            onNavigateToCalculator={() => setActiveTab('calculator')}
+          />
         )}
 
         {activeTab === 'algorithms' && <AlgorithmsGuideView />}
