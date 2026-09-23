@@ -1,12 +1,14 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle, ShieldCheck, HeartHandshake } from 'lucide-react';
 import { GrowthEdgeItem } from '../types/compatibility';
+import { Language, translations } from '../utils/translations';
 
 interface PsychologicalFlagsCardProps {
   greenFlags: string[];
   growthEdges: GrowthEdgeItem[];
   partner1: string;
   partner2: string;
+  lang?: Language;
 }
 
 export const PsychologicalFlagsCard: React.FC<PsychologicalFlagsCardProps> = ({
@@ -14,7 +16,10 @@ export const PsychologicalFlagsCard: React.FC<PsychologicalFlagsCardProps> = ({
   growthEdges,
   partner1,
   partner2,
+  lang = 'en',
 }) => {
+  const t = translations[lang];
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Green Flags Card */}
@@ -25,10 +30,10 @@ export const PsychologicalFlagsCard: React.FC<PsychologicalFlagsCardProps> = ({
           </div>
           <div>
             <h4 className="font-serif-luxury text-2xl font-bold text-emerald-100">
-              Green Flags & Chemistry Boosters
+              {t.greenFlagsTitle}
             </h4>
             <p className="text-xs text-emerald-300/70 font-light">
-              Intuitive superpowers that make this union feel like home
+              {t.greenFlagsSub}
             </p>
           </div>
         </div>
@@ -56,27 +61,33 @@ export const PsychologicalFlagsCard: React.FC<PsychologicalFlagsCardProps> = ({
           </div>
           <div>
             <h4 className="font-serif-luxury text-2xl font-bold text-amber-100">
-              Growth Edges & Playful Quirks
+              {t.growthEdgesTitle}
             </h4>
             <p className="text-xs text-amber-300/70 font-light">
-              Lovable friction points and how to turn them into closer intimacy
+              {t.growthEdgesSub}
             </p>
           </div>
         </div>
 
         <div className="space-y-4">
-          {growthEdges.map((edge, idx) => (
+          {growthEdges.map((item, idx) => (
             <div
               key={idx}
-              className="rounded-2xl border border-amber-900/20 bg-amber-950/20 p-4 space-y-2 transition-all hover:bg-amber-950/30"
+              className="rounded-2xl border border-amber-900/30 bg-amber-950/15 p-4 space-y-2"
             >
-              <div className="flex items-center gap-2 text-xs font-semibold text-amber-300">
-                <AlertCircle className="h-3.5 w-3.5 text-amber-400" />
-                <span>{edge.quirk}</span>
+              <div className="flex items-start gap-2.5">
+                <AlertCircle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <h5 className="text-xs sm:text-sm font-semibold text-amber-100">
+                    {item.quirk}
+                  </h5>
+                </div>
               </div>
-              <p className="text-xs sm:text-sm text-amber-100/85 font-light leading-relaxed pl-5 border-l border-amber-500/30">
-                <strong className="font-medium text-amber-200">The Fix:</strong> {edge.remedy}
-              </p>
+
+              <div className="rounded-xl bg-black/40 border border-amber-900/30 px-3.5 py-2.5 text-xs text-amber-200/90 font-light flex items-start gap-2">
+                <span className="font-semibold text-amber-400 shrink-0">{t.theFix}</span>
+                <span>{item.remedy}</span>
+              </div>
             </div>
           ))}
         </div>

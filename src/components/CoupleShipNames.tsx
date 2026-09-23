@@ -2,19 +2,23 @@ import React, { useState } from 'react';
 import { Copy, Check, Sparkles, Heart } from 'lucide-react';
 import { CoupleNickname } from '../types/compatibility';
 import { romanticAudio } from '../utils/audio';
+import { Language, translations } from '../utils/translations';
 
 interface CoupleShipNamesProps {
   nicknames: CoupleNickname[];
   partner1: string;
   partner2: string;
+  lang?: Language;
 }
 
 export const CoupleShipNames: React.FC<CoupleShipNamesProps> = ({
   nicknames,
   partner1,
   partner2,
+  lang = 'en',
 }) => {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const t = translations[lang];
 
   const handleCopy = (blend: string, index: number) => {
     navigator.clipboard.writeText(blend);
@@ -23,6 +27,14 @@ export const CoupleShipNames: React.FC<CoupleShipNamesProps> = ({
     setTimeout(() => {
       setCopiedIndex(null);
     }, 2000);
+  };
+
+  const getLocalizedCategory = (cat: string) => {
+    if (cat.includes('Classic')) return t.classicPortmanteau;
+    if (cat.includes('Harmonic')) return t.harmonicBlend;
+    if (cat.includes('Poetic')) return t.poeticMoniker;
+    if (cat.includes('Cosmic')) return t.cosmicAlias;
+    return cat;
   };
 
   return (
@@ -34,17 +46,17 @@ export const CoupleShipNames: React.FC<CoupleShipNamesProps> = ({
           </div>
           <div>
             <h4 className="font-serif-luxury text-2xl font-bold text-rose-100">
-              Couple Ship Names
+              {t.shipNamesTitle}
             </h4>
             <p className="text-xs text-rose-300/70 font-light">
-              Algorithmic name blendings tailored for {partner1} & {partner2}
+              {lang === 'bn' ? `${partner1} ও ${partner2}-এর জন্য মিষ্টি রোমান্টিক ডাকনাম` : `Algorithmic name blendings tailored for ${partner1} & ${partner2}`}
             </p>
           </div>
         </div>
 
         <div className="inline-flex items-center gap-1.5 text-xs text-rose-400/80">
           <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-          <span>Tap to copy moniker</span>
+          <span>{t.copyMoniker}</span>
         </div>
       </div>
 
@@ -58,29 +70,32 @@ export const CoupleShipNames: React.FC<CoupleShipNamesProps> = ({
               className={`group relative flex flex-col justify-between rounded-2xl border p-4 text-left transition-all cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 active:scale-[0.98] ${
                 isCopied
                   ? 'border-emerald-500/60 bg-emerald-950/20 shadow-lg shadow-emerald-950/30'
-                  : 'border-rose-900/40 bg-[#1e0a24]/50 hover:border-rose-500/50 hover:bg-[#250d2d]/60'
+                  : 'border-rose-900/50 bg-[#150617]/70 hover:border-rose-500/50 hover:bg-rose-950/30 hover:shadow-md'
               }`}
             >
               <div>
-                <div className="flex items-center justify-between gap-2 text-[11px] text-rose-400/80 mb-2 font-medium">
-                  <span className="truncate">{item.category}</span>
-                  <div className="h-6 w-6 rounded-lg flex items-center justify-center bg-rose-950/40 group-hover:bg-rose-900/40 transition-colors">
-                    {isCopied ? (
-                      <Check className="h-3.5 w-3.5 text-emerald-400" />
-                    ) : (
-                      <Copy className="h-3.5 w-3.5 text-rose-300/70 group-hover:text-rose-100" />
-                    )}
-                  </div>
-                </div>
-
-                <div className="font-serif-luxury text-2xl font-bold text-rose-100 tracking-wide group-hover:text-rose-200 transition-colors">
+                <span className="text-[10px] font-semibold uppercase tracking-wider text-rose-400/75">
+                  {getLocalizedCategory(item.category)}
+                </span>
+                <div className="font-serif-luxury text-2xl font-bold text-white tracking-wide mt-1 group-hover:text-rose-200 transition-colors">
                   {item.blend}
                 </div>
               </div>
 
-              <p className="mt-3 text-[11px] text-rose-300/60 font-light leading-snug">
-                {item.tagline}
-              </p>
+              <div className="mt-4 flex items-center justify-between border-t border-rose-900/30 pt-3">
+                <span className="text-[11px] text-rose-300/60 font-light truncate mr-2">
+                  {item.tagline}
+                </span>
+                <div
+                  className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-lg transition-colors ${
+                    isCopied
+                      ? 'bg-emerald-500/20 text-emerald-400'
+                      : 'bg-rose-900/40 text-rose-300 group-hover:bg-rose-800/50 group-hover:text-white'
+                  }`}
+                >
+                  {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                </div>
+              </div>
             </button>
           );
         })}

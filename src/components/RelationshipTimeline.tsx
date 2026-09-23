@@ -1,30 +1,37 @@
 import React from 'react';
 import { Calendar, Compass, Milestone, Sparkles, Heart } from 'lucide-react';
 import { TimelineMilestone } from '../types/compatibility';
+import { Language, translations } from '../utils/translations';
 
 interface RelationshipTimelineProps {
   timeline: TimelineMilestone[];
   partner1: string;
   partner2: string;
+  lang?: Language;
 }
 
 export const RelationshipTimeline: React.FC<RelationshipTimelineProps> = ({
   timeline,
   partner1,
   partner2,
+  lang = 'en',
 }) => {
+  const t = translations[lang];
+
   return (
     <div className="rounded-3xl border border-rose-900/40 bg-gradient-to-b from-[#18081c] via-[#120516] to-[#0d0312] p-6 sm:p-10 shadow-xl shadow-rose-950/20">
       <div className="text-center max-w-2xl mx-auto mb-10">
         <div className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-rose-400 mb-2">
           <Milestone className="h-3.5 w-3.5" />
-          <span>Synchronicity Roadmap</span>
+          <span>{lang === 'bn' ? 'সম্পর্কের যাত্রাপথ' : 'Synchronicity Roadmap'}</span>
         </div>
         <h3 className="font-serif-luxury text-3xl sm:text-4xl font-bold text-rose-100">
-          Relationship Milestone Timeline
+          {t.timelineTitle}
         </h3>
         <p className="text-xs sm:text-sm text-rose-300/70 font-light mt-2">
-          A projected trajectory of deeper connection, emotional breakthroughs, and shared memories for {partner1} and {partner2}.
+          {lang === 'bn'
+            ? `${partner1} ও ${partner2}-এর গভীর সংযোগ, আবেগের প্রকাশ এবং যৌথ স্মৃতির সম্ভাব্য ভবিষ্যৎ পূর্বাভাস।`
+            : `A projected trajectory of deeper connection, emotional breakthroughs, and shared memories for ${partner1} and ${partner2}.`}
         </p>
       </div>
 
@@ -43,7 +50,7 @@ export const RelationshipTimeline: React.FC<RelationshipTimelineProps> = ({
                 </span>
                 <div className="flex items-center gap-1.5 text-[11px] text-amber-300/80">
                   <Sparkles className="h-3 w-3" />
-                  <span>Phase 0{idx + 1}</span>
+                  <span>{lang === 'bn' ? `ধাপ ০${idx + 1}` : `Phase 0${idx + 1}`}</span>
                 </div>
               </div>
 
@@ -58,7 +65,7 @@ export const RelationshipTimeline: React.FC<RelationshipTimelineProps> = ({
               <div className="flex items-start gap-2 pt-3 border-t border-rose-950/60 text-xs text-rose-300/80">
                 <Compass className="h-4 w-4 text-rose-400 shrink-0 mt-0.5" />
                 <span>
-                  <strong className="text-rose-200 font-medium">Recommended Anchor:</strong>{' '}
+                  <strong className="text-rose-200 mr-1">{t.anchorLabel}</strong>
                   {item.recommendedAction}
                 </span>
               </div>

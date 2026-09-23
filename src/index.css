@@ -11,6 +11,23 @@
     font-family: var(--font-sans);
     background-color: #0d0610;
     color: #f7ecf4;
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  /* Themes */
+  body[data-theme="midnight"],
+  [data-theme="midnight"] {
+    background: radial-gradient(circle at 50% 10%, #230a1c 0%, #120516 50%, #0d0411 100%);
+  }
+
+  body[data-theme="rosegold"],
+  [data-theme="rosegold"] {
+    background: radial-gradient(circle at 50% 10%, #2b1224 0%, #1c0c17 50%, #130610 100%);
+  }
+
+  body[data-theme="lavender"],
+  [data-theme="lavender"] {
+    background: radial-gradient(circle at 50% 10%, #221239 0%, #150a24 50%, #0c0617 100%);
   }
 }
 

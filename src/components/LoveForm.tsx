@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ArrowLeftRight, Calendar, Heart, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
 import { getLetterBreakdown } from '../utils/algorithms';
 import { romanticAudio } from '../utils/audio';
+import { Language, translations } from '../utils/translations';
 
 interface LoveFormProps {
   onAnalyze: (
@@ -14,6 +15,7 @@ interface LoveFormProps {
     }
   ) => void;
   isLoading: boolean;
+  lang?: Language;
 }
 
 const PRESET_COUPLES = [
@@ -24,13 +26,15 @@ const PRESET_COUPLES = [
   { p1: 'Cleopatra', p2: 'Antony', label: 'Cleopatra & Antony' },
 ];
 
-export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
+export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading, lang = 'en' }) => {
   const [name1, setName1] = useState('');
   const [name2, setName2] = useState('');
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [dob1, setDob1] = useState('');
   const [dob2, setDob2] = useState('');
   const [stage, setStage] = useState('Dating & In Love');
+
+  const t = translations[lang];
 
   const p1Letters = getLetterBreakdown(name1);
   const p2Letters = getLetterBreakdown(name2);
@@ -68,13 +72,13 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
       <div className="text-center mb-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300 mb-3">
           <Sparkles className="h-3 w-3 text-rose-400" />
-          <span>Multi-Algorithmic Synastry Engine</span>
+          <span>{lang === 'bn' ? 'মাল্টি-অ্যালগরিদমিক সিনাস্ট্রি ইঞ্জিন' : 'Multi-Algorithmic Synastry Engine'}</span>
         </div>
         <h1 className="font-serif-luxury text-4xl sm:text-5xl md:text-6xl font-normal text-rose-100 tracking-tight text-balance mb-4">
-          Discover Your Sacred Name Compatibility
+          {t.formTitle}
         </h1>
         <p className="text-rose-200/70 text-base sm:text-lg max-w-2xl mx-auto font-light leading-relaxed">
-          Decoding the vibrational frequencies of your names through ancient Pythagorean numerology, Chaldean planetary vectors, phonetic cadence, and the legendary FLAMES matrix.
+          {t.formSubtitle}
         </p>
       </div>
 
@@ -89,14 +93,14 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
             {/* Partner 1 Input */}
             <div className="lg:col-span-5 space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-rose-300/80">
-                Partner One (First or Full Name)
+                {t.partner1Label}
               </label>
               <div className="relative">
                 <input
                   type="text"
                   value={name1}
                   onChange={(e) => setName1(e.target.value)}
-                  placeholder="e.g. Juliet"
+                  placeholder={t.partner1Placeholder}
                   maxLength={32}
                   className="w-full rounded-xl border border-rose-900/50 bg-[#1e0d23]/80 px-4 py-3.5 text-base sm:text-lg font-medium text-rose-50 placeholder-rose-400/30 focus:border-rose-400 focus:bg-[#25102c] focus:outline-none focus:ring-1 focus:ring-rose-400/50 transition-all"
                 />
@@ -120,7 +124,7 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
                     </div>
                   ))}
                   <span className="text-[10px] text-rose-400/50 self-center ml-1">
-                    Chaldean codes
+                    {lang === 'bn' ? 'ক্যালডিয়ান কোড' : 'Chaldean codes'}
                   </span>
                 </div>
               )}
@@ -132,7 +136,7 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
                 type="button"
                 onClick={handleSwap}
                 title="Swap names"
-                className="group flex h-11 w-11 items-center justify-center rounded-full border border-rose-800/60 bg-gradient-to-br from-rose-950/80 to-purple-950/80 text-rose-400 hover:border-rose-500 hover:text-rose-200 hover:scale-105 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400"
+                className="group flex h-11 w-11 items-center justify-center rounded-full border border-rose-800/60 bg-gradient-to-br from-rose-950/80 to-purple-950/80 text-rose-400 hover:border-rose-500 hover:text-rose-200 hover:scale-105 active:scale-95 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-400 cursor-pointer"
               >
                 <ArrowLeftRight className="h-4 w-4 transition-transform group-hover:rotate-180" />
               </button>
@@ -141,14 +145,14 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
             {/* Partner 2 Input */}
             <div className="lg:col-span-5 space-y-2">
               <label className="block text-xs font-semibold uppercase tracking-wider text-rose-300/80">
-                Partner Two (First or Full Name)
+                {t.partner2Label}
               </label>
               <div className="relative">
                 <input
                   type="text"
                   value={name2}
                   onChange={(e) => setName2(e.target.value)}
-                  placeholder="e.g. Romeo"
+                  placeholder={t.partner2Placeholder}
                   maxLength={32}
                   className="w-full rounded-xl border border-rose-900/50 bg-[#1e0d23]/80 px-4 py-3.5 text-base sm:text-lg font-medium text-rose-50 placeholder-rose-400/30 focus:border-rose-400 focus:bg-[#25102c] focus:outline-none focus:ring-1 focus:ring-rose-400/50 transition-all"
                 />
@@ -172,7 +176,7 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
                     </div>
                   ))}
                   <span className="text-[10px] text-rose-400/50 self-center ml-1">
-                    Chaldean codes
+                    {lang === 'bn' ? 'ক্যালডিয়ান কোড' : 'Chaldean codes'}
                   </span>
                 </div>
               )}
@@ -181,13 +185,15 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
 
           {/* Preset quick test buttons */}
           <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-rose-950/40">
-            <span className="text-xs text-rose-400/60 mr-1">Famous Pairs:</span>
+            <span className="text-xs text-rose-400/60 mr-1">
+              {lang === 'bn' ? 'জনপ্রিয় জুটি:' : 'Famous Pairs:'}
+            </span>
             {PRESET_COUPLES.map((pair) => (
               <button
                 key={pair.label}
                 type="button"
                 onClick={() => handleSelectPreset(pair.p1, pair.p2)}
-                className="rounded-lg border border-rose-900/40 bg-rose-950/20 px-2.5 py-1 text-xs text-rose-200/70 hover:border-rose-600/50 hover:bg-rose-900/30 hover:text-rose-100 transition-colors"
+                className="rounded-lg border border-rose-900/40 bg-rose-950/20 px-2.5 py-1 text-xs text-rose-200/70 hover:border-rose-600/50 hover:bg-rose-900/30 hover:text-rose-100 transition-colors cursor-pointer"
               >
                 {pair.label}
               </button>
@@ -199,11 +205,13 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
             <button
               type="button"
               onClick={() => setShowAdvanced(!showAdvanced)}
-              className="flex items-center gap-2 text-xs font-semibold text-rose-300 hover:text-rose-100 transition-colors"
+              className="flex items-center gap-2 text-xs font-semibold text-rose-300 hover:text-rose-100 transition-colors cursor-pointer"
             >
               <Calendar className="h-3.5 w-3.5 text-rose-400" />
               <span>
-                {showAdvanced ? 'Hide Astrological & Stage Details' : 'Add Birth Dates & Relationship Stage (Optional Cosmic Alignment)'}
+                {showAdvanced
+                  ? (lang === 'bn' ? 'জ্যোতিষ ও স্টেজ সংক্রান্ত অপশন লুকান' : 'Hide Astrological & Stage Details')
+                  : t.optionalAstrology}
               </span>
               {showAdvanced ? <ChevronUp className="h-3.5 w-3.5" /> : <ChevronDown className="h-3.5 w-3.5" />}
             </button>
@@ -212,70 +220,75 @@ export const LoveForm: React.FC<LoveFormProps> = ({ onAnalyze, isLoading }) => {
               <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4 rounded-xl border border-rose-900/30 bg-[#160719]/60 p-4">
                 <div>
                   <label className="block text-[11px] font-medium text-rose-300/70 mb-1">
-                    Partner 1 Birth Date
+                    {t.partner1Dob}
                   </label>
                   <input
                     type="date"
                     value={dob1}
                     onChange={(e) => setDob1(e.target.value)}
-                    className="w-full rounded-lg border border-rose-900/40 bg-[#1f0b24] px-3 py-2 text-xs text-rose-100 focus:border-rose-400 focus:outline-none"
+                    className="w-full rounded-lg border border-rose-900/50 bg-[#1c0c20] px-3 py-2 text-xs text-rose-100 focus:border-rose-400 focus:outline-none"
                   />
                 </div>
+
                 <div>
                   <label className="block text-[11px] font-medium text-rose-300/70 mb-1">
-                    Partner 2 Birth Date
+                    {t.partner2Dob}
                   </label>
                   <input
                     type="date"
                     value={dob2}
                     onChange={(e) => setDob2(e.target.value)}
-                    className="w-full rounded-lg border border-rose-900/40 bg-[#1f0b24] px-3 py-2 text-xs text-rose-100 focus:border-rose-400 focus:outline-none"
+                    className="w-full rounded-lg border border-rose-900/50 bg-[#1c0c20] px-3 py-2 text-xs text-rose-100 focus:border-rose-400 focus:outline-none"
                   />
                 </div>
+
                 <div>
                   <label className="block text-[11px] font-medium text-rose-300/70 mb-1">
-                    Relationship Stage
+                    {t.stageLabel}
                   </label>
                   <select
                     value={stage}
                     onChange={(e) => setStage(e.target.value)}
-                    className="w-full rounded-lg border border-rose-900/40 bg-[#1f0b24] px-3 py-2 text-xs text-rose-100 focus:border-rose-400 focus:outline-none"
+                    className="w-full rounded-lg border border-rose-900/50 bg-[#1c0c20] px-3 py-2 text-xs text-rose-100 focus:border-rose-400 focus:outline-none"
                   >
-                    <option value="Secret Crush">Secret Crush / Curious Spark</option>
-                    <option value="Dating & In Love">Dating & In Love</option>
-                    <option value="Long-term Partners">Long-term Partners</option>
-                    <option value="Engaged & Preparing">Engaged & Preparing</option>
-                    <option value="Married & Soulmates">Married & Soulmates</option>
+                    <option value="Secret Crush">{t.stages.crush}</option>
+                    <option value="Dating & Exploring">{t.stages.dating}</option>
+                    <option value="Engaged & Committed">{t.stages.engaged}</option>
+                    <option value="Married Bliss">{t.stages.married}</option>
+                    <option value="Twin Flame & Soulmates">{t.stages.soulmates}</option>
                   </select>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Primary Action Button */}
+          {/* Submission Button */}
           <div className="pt-2">
             <button
               type="submit"
               disabled={!isValid || isLoading}
-              className={`w-full group relative overflow-hidden rounded-xl py-4 px-6 text-center font-medium text-white transition-all shadow-xl ${
+              className={`w-full group relative flex items-center justify-center gap-3 rounded-2xl py-4 px-8 text-base sm:text-lg font-semibold tracking-wide transition-all shadow-xl active:scale-[0.99] cursor-pointer ${
                 isValid && !isLoading
-                  ? 'bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 hover:from-rose-500 hover:via-pink-500 hover:to-rose-600 shadow-rose-950/60 active:scale-[0.99] cursor-pointer'
-                  : 'bg-rose-950/40 text-rose-400/40 border border-rose-950 cursor-not-allowed'
+                  ? 'bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 text-white shadow-rose-950/80 hover:from-rose-500 hover:via-pink-500 hover:to-rose-600 hover:shadow-rose-900/60'
+                  : 'bg-rose-950/30 text-rose-400/40 border border-rose-900/40 cursor-not-allowed'
               }`}
             >
-              <div className="flex items-center justify-center gap-2">
-                <Heart className="h-5 w-5 fill-current text-white/90 group-hover:scale-125 transition-transform" />
-                <span className="font-serif-luxury text-xl tracking-wide font-bold">
-                  {isLoading ? 'Synthesizing Compatibility...' : 'Calculate Love Compatibility'}
-                </span>
-                <Sparkles className="h-4 w-4 text-amber-300 opacity-80 group-hover:opacity-100 transition-opacity" />
-              </div>
+              <Heart
+                className={`h-5 w-5 ${
+                  isValid && !isLoading
+                    ? 'fill-white text-white group-hover:scale-125 transition-transform animate-pulse'
+                    : 'text-rose-400/40'
+                }`}
+              />
+              <span>
+                {isLoading ? t.calculatingButton : t.calculateButton}
+              </span>
+              <Sparkles
+                className={`h-4 w-4 ${
+                  isValid && !isLoading ? 'text-amber-300' : 'text-rose-400/30'
+                }`}
+              />
             </button>
-            {!isValid && (
-              <p className="text-center text-xs text-rose-400/50 mt-2">
-                Enter both names (minimum 2 letters each) to unlock your algorithmic reading
-              </p>
-            )}
           </div>
         </form>
       </div>

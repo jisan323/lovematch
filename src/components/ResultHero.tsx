@@ -1,31 +1,37 @@
 import React, { useEffect, useState } from 'react';
-import { Award, Bookmark, BookmarkCheck, Heart, RotateCcw, Share2, Sparkles } from 'lucide-react';
+import { Award, Bookmark, BookmarkCheck, Heart, RotateCcw, Share2, Sparkles, Smartphone, Check } from 'lucide-react';
 import { CompatibilityResult } from '../types/compatibility';
 import { romanticAudio } from '../utils/audio';
+import { Language, translations } from '../utils/translations';
 
 interface ResultHeroProps {
   result: CompatibilityResult;
   onOpenCertificate: () => void;
+  onOpenStoryCard: () => void;
   onSave: () => void;
   isSaved: boolean;
   onReset: () => void;
+  lang: Language;
 }
 
 export const ResultHero: React.FC<ResultHeroProps> = ({
   result,
   onOpenCertificate,
+  onOpenStoryCard,
   onSave,
   isSaved,
   onReset,
+  lang,
 }) => {
   const [displayedScore, setDisplayedScore] = useState(0);
   const [copiedShare, setCopiedShare] = useState(false);
+  const t = translations[lang];
 
   useEffect(() => {
     let start = 0;
     const duration = 1200;
     const end = result.overallPercentage;
-    const stepTime = Math.abs(Math.floor(duration / end));
+    const stepTime = Math.max(10, Math.abs(Math.floor(duration / (end || 1))));
 
     const timer = setInterval(() => {
       start += 1;
@@ -40,14 +46,20 @@ export const ResultHero: React.FC<ResultHeroProps> = ({
 
   const handleShare = async () => {
     romanticAudio.playSoftChime(659.25);
-    const shareText = `✨ ${result.partner1Name} & ${result.partner2Name} have a ${result.overallPercentage}% Love Compatibility (${result.tier.title}) according to LoveMatch's algorithmic synastry engine!`;
+    const origin = window.location.origin;
+    const path = window.location.pathname;
+    const stageQuery = result.relationshipStage ? `&stage=${encodeURIComponent(result.relationshipStage)}` : '';
+    const shareUrl = `${origin}${path}?p1=${encodeURIComponent(result.partner1Name)}&p2=${encodeURIComponent(result.partner2Name)}${stageQuery}`;
+
+    const shareTitle = `${result.partner1Name} & ${result.partner2Name} (${result.overallPercentage}%) - LoveMatch`;
+    const shareText = `✨ ${result.partner1Name} & ${result.partner2Name} scored ${result.overallPercentage}% Compatibility (${result.tier.title}) on LoveMatch!\nOpen our relationship synastry report here: ${shareUrl}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `LoveMatch Compatibility: ${result.partner1Name} & ${result.partner2Name}`,
+          title: shareTitle,
           text: shareText,
-          url: window.location.href,
+          url: shareUrl,
         });
         return;
       } catch {
@@ -56,7 +68,7 @@ export const ResultHero: React.FC<ResultHeroProps> = ({
     }
 
     try {
-      await navigator.clipboard.writeText(shareText);
+      await navigator.clipboard.writeText(shareUrl);
       setCopiedShare(true);
       setTimeout(() => setCopiedShare(false), 2500);
     } catch {
@@ -71,7 +83,7 @@ export const ResultHero: React.FC<ResultHeroProps> = ({
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      <div className="relative overflow-hidden rounded-3xl border border-rose-900/40 bg-gradient-to-b from-[#1c0a1f] via-[#140616] to-[#0f0412] p-8 sm:p-12 shadow-2xl shadow-rose-950/40 backdrop-blur-xl">
+      <div className="relative overflow-hidden rounded-3xl border border-rose-900/40 bg-gradient-to-b from-[#1c0a1f] via-[#140616] to-[#0f0412] p-6 sm:p-12 shadow-2xl shadow-rose-950/40 backdrop-blur-xl">
         {/* Subtle decorative glow */}
         <div
           className="pointer-events-none absolute -top-32 left-1/2 -translate-x-1/2 h-64 w-96 rounded-full blur-3xl opacity-20"
@@ -84,7 +96,7 @@ export const ResultHero: React.FC<ResultHeroProps> = ({
           <span aria-hidden="true" className="text-rose-600/60">·</span>
           <span>{result.relationshipStage || 'Romantic Sync'}</span>
           <span aria-hidden="true" className="text-rose-600/60">·</span>
-          <span>Calculated {result.calculatedAt}</span>
+          <span>{result.calculatedAt}</span>
         </div>
 
         {/* Central Names */}
@@ -140,7 +152,7 @@ export const ResultHero: React.FC<ResultHeroProps> = ({
                 {displayedScore}%
               </div>
               <span className="text-[11px] font-semibold uppercase tracking-widest text-rose-300/80 mt-1">
-                Compatibility
+                {t.harmonyScore}
               </span>
             </div>
           </div>
@@ -159,7 +171,7 @@ export const ResultHero: React.FC<ResultHeroProps> = ({
         {/* Archetype Essence callout */}
         <div className="rounded-2xl border border-rose-900/40 bg-[#17061a]/60 p-5 sm:p-6 mb-8 text-center max-w-2xl mx-auto">
           <span className="text-xs uppercase tracking-wider text-amber-400/90 font-medium">
-            Cosmic Archetype: {result.archetype.name}
+            {t.archetypeBadge}: {result.archetype.name}
           </span>
           <p className="text-sm text-rose-200/80 font-light mt-2 leading-relaxed">
             {result.archetype.essence}
@@ -168,49 +180,65 @@ export const ResultHero: React.FC<ResultHeroProps> = ({
 
         {/* Primary Action Controls */}
         <div className="flex flex-wrap items-center justify-center gap-3">
+          {/* 9:16 Instagram Story Generator CTA */}
+          <button
+            onClick={() => {
+              romanticAudio.playSoftChime(783.99);
+              onOpenStoryCard();
+            }}
+            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 via-pink-600 to-amber-500 px-5 py-3 text-xs sm:text-sm font-semibold text-white shadow-lg shadow-rose-950/70 hover:from-rose-500 hover:to-amber-400 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+          >
+            <Smartphone className="h-4 w-4" />
+            <span>{t.downloadStory}</span>
+          </button>
+
+          {/* Love Certificate */}
           <button
             onClick={() => {
               romanticAudio.playSoftChime(659.25);
               onOpenCertificate();
             }}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-600 via-pink-600 to-rose-700 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-rose-950/60 hover:from-rose-500 hover:via-pink-500 hover:to-rose-600 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
+            className="flex items-center gap-2 rounded-xl border border-rose-800/60 bg-rose-950/40 px-4 py-3 text-xs sm:text-sm font-semibold text-rose-100 hover:bg-rose-900/40 active:scale-95 transition-all cursor-pointer whitespace-nowrap"
           >
-            <Award className="h-4 w-4" />
-            <span>Generate Love Certificate</span>
+            <Award className="h-4 w-4 text-amber-400" />
+            <span>{t.downloadCertificate}</span>
           </button>
 
+          {/* Unique Shareable Link */}
+          <button
+            onClick={handleShare}
+            className="flex items-center gap-2 rounded-xl border border-rose-800/60 bg-rose-950/40 px-4 py-3 text-xs sm:text-sm font-medium text-rose-200 hover:border-rose-500/50 hover:bg-rose-900/40 active:scale-95 transition-all whitespace-nowrap cursor-pointer"
+          >
+            {copiedShare ? <Check className="h-4 w-4 text-emerald-400" /> : <Share2 className="h-4 w-4" />}
+            <span>{copiedShare ? t.shareLinkCopied : t.shareResult}</span>
+          </button>
+
+          {/* Save to Favorites */}
           <button
             onClick={() => {
               romanticAudio.playSoftChime(523.25);
               onSave();
             }}
-            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-sm font-medium transition-all active:scale-95 whitespace-nowrap ${
+            className={`flex items-center gap-2 rounded-xl border px-4 py-3 text-xs sm:text-sm font-medium transition-all active:scale-95 whitespace-nowrap cursor-pointer ${
               isSaved
                 ? 'border-emerald-600/50 bg-emerald-950/30 text-emerald-300'
                 : 'border-rose-900/60 bg-rose-950/30 text-rose-200 hover:border-rose-500/50 hover:bg-rose-900/30'
             }`}
           >
             {isSaved ? <BookmarkCheck className="h-4 w-4 text-emerald-400" /> : <Bookmark className="h-4 w-4" />}
-            <span>{isSaved ? 'Pair Saved' : 'Save Pair'}</span>
+            <span>{isSaved ? t.coupleSaved : t.saveCouple}</span>
           </button>
 
-          <button
-            onClick={handleShare}
-            className="flex items-center gap-2 rounded-xl border border-rose-900/60 bg-rose-950/30 px-4 py-3 text-sm font-medium text-rose-200 hover:border-rose-500/50 hover:bg-rose-900/30 active:scale-95 transition-all whitespace-nowrap"
-          >
-            <Share2 className="h-4 w-4" />
-            <span>{copiedShare ? 'Copied Link!' : 'Share Reading'}</span>
-          </button>
-
+          {/* Test Another Pair */}
           <button
             onClick={() => {
               romanticAudio.playSoftChime(440);
               onReset();
             }}
-            className="flex items-center gap-2 rounded-xl border border-rose-900/40 bg-transparent px-4 py-3 text-sm font-medium text-rose-300/80 hover:text-rose-100 hover:bg-rose-950/20 active:scale-95 transition-all whitespace-nowrap"
+            className="flex items-center gap-2 rounded-xl border border-rose-900/40 bg-transparent px-4 py-3 text-xs sm:text-sm font-medium text-rose-300/80 hover:text-rose-100 hover:bg-rose-950/20 active:scale-95 transition-all whitespace-nowrap cursor-pointer"
           >
             <RotateCcw className="h-4 w-4" />
-            <span>Test Another</span>
+            <span>{t.recalculate}</span>
           </button>
         </div>
       </div>

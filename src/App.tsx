@@ -8,20 +8,24 @@ import { DimensionalBreakdown } from './components/DimensionalBreakdown';
 import { AlgorithmInspector } from './components/AlgorithmInspector';
 import { RelationshipAdvice } from './components/RelationshipAdvice';
 import { CoupleShipNames } from './components/CoupleShipNames';
-import { LoveQuizView } from './components/LoveQuizView';
 import { LoveCertificateModal } from './components/LoveCertificateModal';
+import { StoryCardModal } from './components/StoryCardModal';
 import { FamousCouplesView } from './components/FamousCouplesView';
 import { AlgorithmsGuideView } from './components/AlgorithmsGuideView';
 import { SavedPairsView } from './components/SavedPairsView';
 import { LoveConfetti } from './components/LoveConfetti';
 import { CompatibilityResult, SavedCouple } from './types/compatibility';
+import { ThemeMode } from './types/theme';
+import { Language, translations } from './utils/translations';
 import { calculateCompatibility } from './utils/algorithms';
 import { romanticAudio } from './utils/audio';
 
 const STORAGE_KEY = 'lovematch_saved_couples_v1';
+const THEME_KEY = 'lovematch_theme_v1';
+const LANG_KEY = 'lovematch_lang_v1';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'calculator' | 'quiz' | 'algorithms' | 'famous' | 'history'>('calculator');
+  const [activeTab, setActiveTab] = useState<'calculator' | 'algorithms' | 'famous' | 'history'>('calculator');
   const [isCalculating, setIsCalculating] = useState(false);
   const [currentResult, setCurrentResult] = useState<CompatibilityResult | null>(null);
   const [pendingCalculation, setPendingCalculation] = useState<{
@@ -36,9 +40,48 @@ export default function App() {
 
   const [confettiKey, setConfettiKey] = useState(0);
   const [showCertificate, setShowCertificate] = useState(false);
+  const [showStoryCard, setShowStoryCard] = useState(false);
   const [savedPairs, setSavedPairs] = useState<SavedCouple[]>([]);
 
-  // Load saved pairs from localStorage on mount
+  // Theme & Language State
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    try {
+      const saved = localStorage.getItem(THEME_KEY) as ThemeMode;
+      return saved === 'rosegold' || saved === 'lavender' ? saved : 'midnight';
+    } catch {
+      return 'midnight';
+    }
+  });
+
+  const [lang, setLang] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem(LANG_KEY) as Language;
+      return saved === 'bn' ? 'bn' : 'en';
+    } catch {
+      return 'en';
+    }
+  });
+
+  // Apply theme to document body
+  useEffect(() => {
+    document.body.setAttribute('data-theme', theme);
+    try {
+      localStorage.setItem(THEME_KEY, theme);
+    } catch {
+      // ignore
+    }
+  }, [theme]);
+
+  // Persist language
+  useEffect(() => {
+    try {
+      localStorage.setItem(LANG_KEY, lang);
+    } catch {
+      // ignore
+    }
+  }, [lang]);
+
+  // Load saved pairs and URL shared link parameters on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY) || localStorage.getItem('amora_saved_couples_v1');
@@ -47,6 +90,20 @@ export default function App() {
       }
     } catch {
       // localStorage may be disabled or empty
+    }
+
+    // Check for Shareable Link parameters: ?p1=Name1&p2=Name2
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const p1 = params.get('p1');
+      const p2 = params.get('p2');
+      const stage = params.get('stage') || undefined;
+
+      if (p1 && p2 && p1.trim() && p2.trim()) {
+        handleStartAnalysis(p1.trim(), p2.trim(), {
+          relationshipStage: stage,
+        });
+      }
     }
   }, []);
 
@@ -143,6 +200,10 @@ export default function App() {
     setCurrentResult(null);
     setIsCalculating(false);
     setPendingCalculation(null);
+    // Clean URL query params if any
+    if (window.history.pushState && window.location.search) {
+      window.history.pushState({}, '', window.location.pathname);
+    }
   };
 
   const isCurrentSaved = Boolean(
@@ -156,17 +217,23 @@ export default function App() {
       )
   );
 
+  const t = translations[lang];
+
   return (
-    <div className="min-h-screen bg-[#0d0510] text-[#fceef6] flex flex-col selection:bg-rose-500/30 selection:text-rose-200">
+    <div className="min-h-screen text-[#fceef6] flex flex-col selection:bg-rose-500/30 selection:text-rose-200">
       {/* Particle celebration confetti */}
       <LoveConfetti triggerKey={confettiKey} />
 
-      {/* Header complying with Top Bar Contract */}
+      {/* Header with Theme, Language, and PWA integration */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onReset={handleReset}
         savedCount={savedPairs.length}
+        lang={lang}
+        setLang={setLang}
+        theme={theme}
+        setTheme={setTheme}
       />
 
       {/* Main Content Area */}
@@ -178,15 +245,18 @@ export default function App() {
                 name1={pendingCalculation.name1}
                 name2={pendingCalculation.name2}
                 onComplete={handleAnimationComplete}
+                lang={lang}
               />
             ) : currentResult ? (
               <div className="space-y-10 animate-fadeIn">
                 <ResultHero
                   result={currentResult}
                   onOpenCertificate={() => setShowCertificate(true)}
+                  onOpenStoryCard={() => setShowStoryCard(true)}
                   onSave={handleSaveCurrent}
                   isSaved={isCurrentSaved}
                   onReset={handleReset}
+                  lang={lang}
                 />
 
                 {currentResult.psychology?.coupleNicknames && (
@@ -194,6 +264,7 @@ export default function App() {
                     nicknames={currentResult.psychology.coupleNicknames}
                     partner1={currentResult.partner1Name}
                     partner2={currentResult.partner2Name}
+                    lang={lang}
                   />
                 )}
 
@@ -201,27 +272,17 @@ export default function App() {
                   dimensions={currentResult.dimensions}
                   partner1={currentResult.partner1Name}
                   partner2={currentResult.partner2Name}
+                  lang={lang}
                 />
 
                 <AlgorithmInspector result={currentResult} />
 
-                <RelationshipAdvice
-                  result={currentResult}
-                  onOpenQuiz={() => setActiveTab('quiz')}
-                />
+                <RelationshipAdvice result={currentResult} lang={lang} />
               </div>
             ) : (
-              <LoveForm onAnalyze={handleStartAnalysis} isLoading={isCalculating} />
+              <LoveForm onAnalyze={handleStartAnalysis} isLoading={isCalculating} lang={lang} />
             )}
           </>
-        )}
-
-        {activeTab === 'quiz' && (
-          <LoveQuizView
-            initialPartner1={currentResult?.partner1Name}
-            initialPartner2={currentResult?.partner2Name}
-            onNavigateToCalculator={() => setActiveTab('calculator')}
-          />
         )}
 
         {activeTab === 'algorithms' && <AlgorithmsGuideView />}
@@ -244,6 +305,15 @@ export default function App() {
         )}
       </main>
 
+      {/* Instagram & TikTok 9:16 Story Card Generator Modal */}
+      {showStoryCard && currentResult && (
+        <StoryCardModal
+          result={currentResult}
+          lang={lang}
+          onClose={() => setShowStoryCard(false)}
+        />
+      )}
+
       {/* Love Certificate Modal */}
       {showCertificate && currentResult && (
         <LoveCertificateModal
@@ -252,19 +322,19 @@ export default function App() {
         />
       )}
 
-      {/* Editorial Footer */}
-      <footer className="mt-auto border-t border-rose-950/60 bg-gradient-to-b from-[#0d0510] via-[#09030b] to-[#060208] py-10 px-4 text-center">
+      {/* Editorial Footer with Creator Identity */}
+      <footer className="mt-auto border-t border-rose-950/60 bg-gradient-to-b from-[#0d0510]/80 via-[#09030b]/90 to-[#060208] py-10 px-4 text-center">
         <div className="mx-auto max-w-4xl space-y-5">
           {/* Creator Signature with Live Heartbeat Animation */}
           <div className="inline-flex items-center gap-2 rounded-full border border-rose-900/40 bg-[#160619]/70 px-5 py-2 shadow-lg shadow-black/50 backdrop-blur-md transition-all hover:border-rose-600/50 group">
             <span className="text-xs sm:text-sm font-medium text-rose-200/85">
-              Crafted with
+              {t.footerMadeWith}
             </span>
             <span className="relative flex items-center justify-center mx-0.5">
               <Heart className="h-4.5 w-4.5 fill-rose-500 text-rose-500 animate-heartbeat drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
             </span>
             <span className="text-xs sm:text-sm font-medium text-rose-200/85">
-              by
+              {t.footerBy}
             </span>
             <button
               onClick={() => romanticAudio.playSoftChime(659.25)}

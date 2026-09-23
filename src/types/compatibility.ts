@@ -107,15 +107,6 @@ export interface PsychologicalInsights {
   growthEdges: GrowthEdgeItem[];
 }
 
-export interface LoveLanguageScore {
-  language: 'Words of Affirmation' | 'Quality Time' | 'Acts of Service' | 'Physical Touch' | 'Receiving Gifts';
-  partner1Score: number;
-  partner2Score: number;
-  matchScore: number;
-  description: string;
-  actionTip: string;
-}
-
 export interface CompatibilityResult {
   id: string;
   calculatedAt: string;
