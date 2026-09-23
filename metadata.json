@@ -1,0 +1,6 @@
+{
+  "name": "LoveMatch - Algorithmic Love & Compatibility Calculator",
+  "description": "Advanced multi-algorithmic couple compatibility analyzer decoding name vibrations, Pythagorean numerology, Chaldean matrices, phonetic cadence, and relational harmony.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
